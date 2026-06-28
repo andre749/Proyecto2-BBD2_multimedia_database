@@ -1,5 +1,5 @@
 import cv2
-path="/home/andre/PycharmProjects/Proyecto2-BBD2_multimedia_database/datasets/dataset_images/images/1163.jpg"
+path= "/home/andre/PycharmProjects/Proyecto2-BBD2_multimedia_database/datasets/dataset_images/images/1163.jpg"
 image=cv2.imread(path)
 if image is None:
     raise FileNotFoundError("Could not open or find the image.")
@@ -19,7 +19,7 @@ keypoints, descriptors = sift.detectAndCompute(gray_image, None)
 print(f"Total Keypoints Detected: {len(keypoints)}")
 print(f"Descriptor Matrix Shape: {descriptors.shape}")
 print("keypoints: ",keypoints)
-print("descriptors: ",descriptors)
+print("descriptors: ",type(descriptors))
 
 
 
