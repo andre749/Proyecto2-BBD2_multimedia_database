@@ -19,7 +19,7 @@ keypoints, descriptors = sift.detectAndCompute(gray_image, None)
 print(f"Total Keypoints Detected: {len(keypoints)}")
 print(f"Descriptor Matrix Shape: {descriptors.shape}")
 print("keypoints: ",keypoints)
-print("descriptors: ",type(descriptors))
+print("descriptors: ",descriptors)
 
 
 
