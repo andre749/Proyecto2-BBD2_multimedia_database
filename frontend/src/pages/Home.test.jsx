@@ -10,9 +10,9 @@ describe('Home', () => {
         <Home />
       </MemoryRouter>,
     )
-    const visualLink = screen.getByRole('link', { name: /busqueda visual e-commerce/i })
+    const documentLink = screen.getByRole('link', { name: /busqueda multimodal en documentos/i })
     const musicLink = screen.getByRole('link', { name: /busqueda musical inteligente/i })
-    expect(visualLink).toHaveAttribute('href', '/visual-search')
+    expect(documentLink).toHaveAttribute('href', '/document-search')
     expect(musicLink).toHaveAttribute('href', '/music-search')
   })
 })

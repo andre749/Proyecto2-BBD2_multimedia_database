@@ -21,14 +21,14 @@ describe('App routing', () => {
   it('renders the nav links', () => {
     renderApp('/')
     expect(screen.getByRole('link', { name: /inicio/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /^busqueda visual$/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^busqueda documentos$/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /^busqueda musical$/i })).toBeInTheDocument()
   })
 
-  it('navigates to the visual search page on click', async () => {
+  it('navigates to the document search page on click', async () => {
     renderApp('/')
     const user = userEvent.setup()
-    await user.click(screen.getByRole('link', { name: /^busqueda visual$/i }))
-    expect(await screen.findByRole('heading', { name: /busqueda visual e-commerce/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: /^busqueda documentos$/i }))
+    expect(await screen.findByRole('heading', { name: /busqueda multimodal en documentos/i })).toBeInTheDocument()
   })
 })

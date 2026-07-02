@@ -1,13 +1,13 @@
-﻿import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 const APPS = [
   {
-    to: '/visual-search',
-    title: 'Busqueda Visual E-commerce',
-    modality: 'Modalidad primaria: Imagen',
+    to: '/document-search',
+    title: 'Busqueda Multimodal en Documentos',
+    modality: 'Modalidad primaria: Texto + Imagen',
     description:
-      'Sube una foto de una prenda y encuentra los 10 productos mas similares usando un codebook de palabras visuales (SIFT + K-Means).',
+      'Busca articulos por texto o por similitud visual de sus figuras, combinando TF-IDF sobre parrafos y SIFT + K-Means sobre imagenes incrustadas.',
     accent: 'from-accent-violet to-fuchsia-400',
   },
   {

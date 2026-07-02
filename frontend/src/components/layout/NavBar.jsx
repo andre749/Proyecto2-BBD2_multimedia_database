@@ -1,9 +1,9 @@
-﻿import { NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 const links = [
   { to: '/', label: 'Inicio', end: true },
-  { to: '/visual-search', label: 'Busqueda Visual' },
+  { to: '/document-search', label: 'Busqueda Documentos' },
   { to: '/music-search', label: 'Busqueda Musical' },
 ]
 
