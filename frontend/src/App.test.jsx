@@ -15,20 +15,20 @@ function renderApp(initialPath = '/') {
 describe('App routing', () => {
   it('renders the home page by default', () => {
     renderApp('/')
-    expect(screen.getByText(/home page/i)).toBeInTheDocument()
+    expect(screen.getByText(/sistema multimodal de recuperacion y busqueda/i)).toBeInTheDocument()
   })
 
   it('renders the nav links', () => {
     renderApp('/')
     expect(screen.getByRole('link', { name: /inicio/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /busqueda visual/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /busqueda musical/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^busqueda visual$/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^busqueda musical$/i })).toBeInTheDocument()
   })
 
   it('navigates to the visual search page on click', async () => {
     renderApp('/')
     const user = userEvent.setup()
-    await user.click(screen.getByRole('link', { name: /busqueda visual/i }))
-    expect(await screen.findByText(/visual search page/i)).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: /^busqueda visual$/i }))
+    expect(await screen.findByRole('heading', { name: /busqueda visual e-commerce/i })).toBeInTheDocument()
   })
 })
