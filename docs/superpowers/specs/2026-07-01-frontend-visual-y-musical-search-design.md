@@ -146,3 +146,25 @@ histogramas combinados del curso.
   tabs Por texto / Por imagen) y DocumentDetailPage.jsx (/document-search/:id, con dos
   HistogramBars: texto e imagen).
 - Se actualiza: Home.jsx (card 1), App.jsx (rutas), NavBar.jsx (link "Busqueda Documentos").
+
+## Actualizacion 2026-07-02: grabacion de audio en vivo (estilo Shazam) en Busqueda Musical
+
+Se agrega una opcion de grabar audio directo desde el microfono en el tab "Por audio similar"
+de MusicSearchPage, ademas de la opcion existente de subir archivo.
+
+### Comportamiento
+- Boton "Grabar audio" pide permiso via `navigator.mediaDevices.getUserMedia({audio:true})`.
+- Graba con `MediaRecorder` durante 8 segundos (auto-stop), mostrando "Escuchando... Ns" con
+  punto pulsante animado.
+- Al detenerse la grabacion, arma un `File` con el audio capturado y dispara `searchMusic`
+  automaticamente (mismo contrato mock que la busqueda por archivo subido).
+
+### Errores
+- Sin soporte del navegador (`!navigator.mediaDevices`): mensaje inline, no intenta grabar.
+- Permiso denegado o sin microfono: mensaje inline "No se pudo acceder al microfono."
+- Cleanup: si el componente se desmonta mientras graba, se detienen el stream de audio y los
+  timers (interval del contador + timeout del auto-stop) para evitar fugas.
+
+### Alcance
+Solo modifica MusicSearchPage.jsx (+test). No afecta VisualSearch/DocumentSearch ni otras
+paginas.
