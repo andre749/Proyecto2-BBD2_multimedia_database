@@ -125,3 +125,24 @@ revisar consola sin errores, y confirmar que las animaciones no generan layout s
 - Las otras 2 aplicaciones sugeridas (documentos multimodales, recomendacion).
 - Descarga/uso del dataset real de Kaggle.
 - Autenticacion de usuarios.
+
+## Actualizacion 2026-07-01: reemplazo de Busqueda Visual E-commerce por Busqueda Multimodal en Documentos
+
+Se reemplaza la aplicacion 1 (Busqueda Visual E-commerce) por la aplicacion 3 del enunciado
+(Busqueda Multimodal en Documentos, modalidad primaria: Texto + Imagen). La aplicacion 2
+(Busqueda Musical Inteligente) no cambia.
+
+### Justificacion
+El equipo decidio priorizar una aplicacion que combine dos modalidades fusionadas por
+documento (texto + imagen), en vez de solo imagen, para mostrar mejor el concepto de
+histogramas combinados del curso.
+
+### Cambios
+- Se elimina: VisualSearchPage.jsx, ProductDetailPage.jsx (+tests), mockData/products.js
+  (+test), searchByImage/getProduct de client.js (+tests), rutas /visual-search*.
+- Se agrega: mockData/documents.js (+test) con ~12 articulos mock (id, title, source,
+  category, abstract, imageUrl, textHistogram, imageHistogram); searchDocuments({mode,
+  query, imageFile}) y getDocument(id) en client.js; DocumentSearchPage.jsx (/document-search,
+  tabs Por texto / Por imagen) y DocumentDetailPage.jsx (/document-search/:id, con dos
+  HistogramBars: texto e imagen).
+- Se actualiza: Home.jsx (card 1), App.jsx (rutas), NavBar.jsx (link "Busqueda Documentos").
