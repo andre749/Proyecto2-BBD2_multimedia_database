@@ -1,4 +1,4 @@
-﻿import { PRODUCTS, getProductById } from './mockData/products.js'
+﻿import { DOCUMENTS, getDocumentById } from './mockData/documents.js'
 import { SONGS, getSongById } from './mockData/songs.js'
 
 function simulateLatency(min = 400, max = 900) {
@@ -15,19 +15,30 @@ function rankBySimilarity(items) {
     .sort((a, b) => b.similarity - a.similarity)
 }
 
-export async function searchByImage(file) {
+export async function searchDocuments({ mode, query, imageFile }) {
   await simulateLatency()
-  if (!file) throw new Error('Se requiere una imagen para buscar.')
-  const queryImageUrl = URL.createObjectURL(file)
-  const shuffled = [...PRODUCTS].sort(() => Math.random() - 0.5).slice(0, 10)
-  return { queryImageUrl, results: rankBySimilarity(shuffled) }
+  if (mode === 'text' && !query) throw new Error('Se requiere un termino de busqueda.')
+  if (mode === 'image' && !imageFile) throw new Error('Se requiere una imagen para buscar.')
+
+  if (mode === 'image') {
+    const queryImageUrl = URL.createObjectURL(imageFile)
+    const shuffled = [...DOCUMENTS].sort(() => Math.random() - 0.5).slice(0, 10)
+    return { queryImageUrl, results: rankBySimilarity(shuffled) }
+  }
+
+  const q = query.toLowerCase()
+  let candidates = DOCUMENTS.filter(
+    (d) => d.title.toLowerCase().includes(q) || d.abstract.toLowerCase().includes(q),
+  )
+  if (candidates.length === 0) candidates = DOCUMENTS.slice(0, 5)
+  return { results: rankBySimilarity(candidates) }
 }
 
-export async function getProduct(id) {
+export async function getDocument(id) {
   await simulateLatency(150, 350)
-  const product = getProductById(id)
-  if (!product) throw new Error(`Producto no encontrado: ${id}`)
-  return product
+  const doc = getDocumentById(id)
+  if (!doc) throw new Error(`Documento no encontrado: ${id}`)
+  return doc
 }
 
 export async function searchMusic({ mode, query, audioFile }) {
