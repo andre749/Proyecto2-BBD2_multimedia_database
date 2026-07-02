@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { searchMusic } from '../../api/client.js'
 import SearchBar from '../../components/shared/SearchBar.jsx'
@@ -13,6 +13,7 @@ const TABS = [
 ]
 
 const GENRE_OPTIONS = ['Indie Pop', 'Reggaeton', 'Rock Alternativo', 'Lo-fi', 'Cumbia Fusion', 'Electronica']
+const RECORD_DURATION_S = 8
 
 export default function MusicSearchPage() {
   const [tab, setTab] = useState('lyrics')
@@ -21,11 +22,33 @@ export default function MusicSearchPage() {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState(null)
   const [results, setResults] = useState([])
+  const [recordingState, setRecordingState] = useState('idle')
+  const [recordingSeconds, setRecordingSeconds] = useState(0)
 
-  const handleSearch = async () => {
+  const recorderRef = useRef(null)
+  const streamRef = useRef(null)
+  const intervalRef = useRef(null)
+  const timeoutRef = useRef(null)
+
+  const clearRecordingTimers = () => {
+    clearInterval(intervalRef.current)
+    clearTimeout(timeoutRef.current)
+    intervalRef.current = null
+    timeoutRef.current = null
+  }
+
+  useEffect(() => {
+    return () => {
+      clearRecordingTimers()
+      streamRef.current?.getTracks().forEach((t) => t.stop())
+    }
+  }, [])
+
+  const runSearch = async (fileOverride) => {
+    const fileToUse = tab === 'audio' ? (fileOverride ?? audioFile) : null
     setError(null)
-    if (tab === 'audio' && !audioFile) {
-      setError('Sube un archivo de audio antes de buscar.')
+    if (tab === 'audio' && !fileToUse) {
+      setError('Sube o graba un audio antes de buscar.')
       return
     }
     if (tab !== 'audio' && !query.trim()) {
@@ -34,12 +57,53 @@ export default function MusicSearchPage() {
     }
     setStatus('loading')
     try {
-      const { results } = await searchMusic({ mode: tab, query, audioFile })
+      const { results } = await searchMusic({ mode: tab, query, audioFile: fileToUse })
       setResults(results)
       setStatus('done')
     } catch (err) {
       setError(err.message)
       setStatus('idle')
+    }
+  }
+
+  const handleSearch = () => runSearch()
+
+  const startRecording = async () => {
+    setError(null)
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError('Tu navegador no soporta grabacion de audio.')
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      streamRef.current = stream
+      const recorder = new MediaRecorder(stream)
+      const chunks = []
+      recorder.ondataavailable = (e) => chunks.push(e.data)
+      recorder.onstop = () => {
+        streamRef.current?.getTracks().forEach((t) => t.stop())
+        streamRef.current = null
+        clearRecordingTimers()
+        setRecordingState('idle')
+        setRecordingSeconds(0)
+        const file = new File([new Blob(chunks, { type: 'audio/webm' })], 'grabacion.webm', {
+          type: 'audio/webm',
+        })
+        setAudioFile(file)
+        runSearch(file)
+      }
+      recorderRef.current = recorder
+      recorder.start()
+      setRecordingState('recording')
+      setRecordingSeconds(0)
+      intervalRef.current = setInterval(() => {
+        setRecordingSeconds((s) => s + 1)
+      }, 1000)
+      timeoutRef.current = setTimeout(() => {
+        recorder.stop()
+      }, RECORD_DURATION_S * 1000)
+    } catch {
+      setError('No se pudo acceder al microfono.')
     }
   }
 
@@ -82,16 +146,35 @@ export default function MusicSearchPage() {
 
       <div className="mb-8">
         {tab === 'audio' ? (
-          <label className="flex w-fit cursor-pointer items-center gap-3 rounded-full bg-white/10 px-5 py-3 text-sm font-medium hover:bg-white/20">
-            {audioFile ? audioFile.name : 'Elegir archivo de audio'}
-            <input
-              type="file"
-              accept="audio/*"
-              aria-label="Subir audio"
-              className="hidden"
-              onChange={(e) => setAudioFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex w-fit cursor-pointer items-center gap-3 rounded-full bg-white/10 px-5 py-3 text-sm font-medium hover:bg-white/20">
+              {audioFile ? audioFile.name : 'Elegir archivo de audio'}
+              <input
+                type="file"
+                accept="audio/*"
+                aria-label="Subir audio"
+                className="hidden"
+                onChange={(e) => setAudioFile(e.target.files?.[0] ?? null)}
+              />
+            </label>
+
+            <motion.button
+              type="button"
+              onClick={startRecording}
+              disabled={recordingState === 'recording'}
+              whileTap={{ scale: 0.95 }}
+              className="flex w-fit items-center gap-3 rounded-full bg-white/10 px-5 py-3 text-sm font-medium hover:bg-white/20 disabled:opacity-70"
+            >
+              <motion.span
+                animate={recordingState === 'recording' ? { scale: [1, 1.4, 1] } : { scale: 1 }}
+                transition={{ duration: 0.9, repeat: recordingState === 'recording' ? Infinity : 0 }}
+                className={`h-3 w-3 rounded-full ${recordingState === 'recording' ? 'bg-red-500' : 'bg-accent-cyan'}`}
+              />
+              {recordingState === 'recording'
+                ? `Escuchando... ${RECORD_DURATION_S - recordingSeconds}s`
+                : 'Grabar audio'}
+            </motion.button>
+          </div>
         ) : tab === 'genre' ? (
           <div className="flex flex-wrap gap-2">
             {GENRE_OPTIONS.map((g) => (
